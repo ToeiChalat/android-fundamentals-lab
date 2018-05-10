@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">WidgetLab</string>
+    <string name="action_settings">Settings</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="random_number_text">RANDOM NUMBER</string>
+    <string name="random_number_place_holder">R: %1d</string>
+    <string name="add_widget">Add widget</string>
+</resources>
