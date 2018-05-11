@@ -103,6 +103,29 @@ class WordListOpenHelper(context: Context)
         return numberOfRowsUpdated
     }
 
+    fun search(word: String): Cursor? {
+        val columns = arrayOf(KEY_WORD)
+        val searchString = "%$word%"
+        val where = "$KEY_WORD LIKE ?"
+        val whereArgs = arrayOf(searchString)
+        var cursor : Cursor? = null
+        try {
+            readableDB = readableDB ?: readableDatabase
+            cursor = readableDB?.query(
+                    WORD_LIST_TABLE,
+                    columns,
+                    where,
+                    whereArgs,
+                    null,
+                    null,
+                    null
+            )
+        } catch (exception: Exception) {
+            Log.e(TAG, "query error", exception)
+        }
+        return cursor
+    }
+
     fun count(): Long {
         readableDB = readableDB ?: readableDatabase
         return DatabaseUtils.queryNumEntries(readableDB, WORD_LIST_TABLE)
@@ -142,8 +165,8 @@ class WordListOpenHelper(context: Context)
         private const val WORD_LIST_TABLE = "word_entries"
         private const val DATABASE_VERSION = 1
 
-        private const val KEY_ID = "_id"
-        private const val KEY_WORD = "word"
+        const val KEY_ID = "_id"
+        const val KEY_WORD = "word"
 
         private val COLUMNS = arrayOf(KEY_ID, KEY_WORD)
 
