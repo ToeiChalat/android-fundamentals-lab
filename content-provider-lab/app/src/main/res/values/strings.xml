@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MinimalistContentProvider</string>
+    <string-array name="words">
+        <item>Android</item>
+        <item>Activity</item>
+        <item>ContentProvider</item>
+        <item>ContentResolver</item>
+    </string-array>
+</resources>
