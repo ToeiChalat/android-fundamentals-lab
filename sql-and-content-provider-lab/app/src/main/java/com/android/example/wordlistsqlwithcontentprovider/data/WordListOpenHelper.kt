@@ -1,4 +1,4 @@
-package com.android.example.wordlistsql.db
+package com.android.example.wordlistsqlwithcontentprovider.data
 
 import android.content.ContentValues
 import android.content.Context
@@ -7,6 +7,12 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import android.database.DatabaseUtils
+import android.database.MatrixCursor
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListContract.ALL_ITEMS
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListContract.DATABASE_NAME
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListContract.WordList.KEY_ID
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListContract.WordList.KEY_WORD
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListContract.WordList.WORD_LIST_TABLE
 
 
 /**
@@ -33,31 +39,27 @@ class WordListOpenHelper(context: Context)
         onCreate(db)
     }
 
-    fun query(position: Int): WordItem? {
-        val query = "SELECT  * FROM $WORD_LIST_TABLE ORDER BY $KEY_WORD ASC LIMIT $position,1"
+    fun query(position: Int): Cursor? {
+        val query = if (position != ALL_ITEMS) {
+            val databasePosition = position + 1 // Because database starts counting at 1.
+            "SELECT $KEY_ID,$KEY_WORD FROM $WORD_LIST_TABLE WHERE $KEY_ID=$databasePosition;"
+        } else {
+            "SELECT  * FROM $WORD_LIST_TABLE ORDER BY $KEY_WORD ASC "
+        }
+
         var cursor: Cursor? = null
-        var entry: WordItem? = null
         try {
             readableDB = readableDB ?: readableDatabase
-            cursor = readableDB?.rawQuery(query, null)
-            cursor?.moveToFirst()
-            cursor?.let {
-                val id = it.getInt(it.getColumnIndex(KEY_ID))
-                val word = it.getString(it.getColumnIndex(KEY_WORD))
-                entry = WordItem(id, word)
-            }
+            cursor =readableDB?.rawQuery(query, null)
         } catch (error: Exception) {
             Log.e(TAG, "query error", error)
         } finally {
-            cursor?.close()
-            return entry
+            return cursor
         }
     }
 
-    fun insert(word: String): Long {
+    fun insert(values: ContentValues): Long {
         var newId: Long? = null
-        val values = ContentValues()
-        values.put(KEY_WORD, word)
         try {
             writableDB = writableDB ?: writableDatabase
             newId = writableDB?.insert(WORD_LIST_TABLE, null, values)
@@ -112,7 +114,7 @@ class WordListOpenHelper(context: Context)
         try {
             readableDB = readableDB ?: readableDatabase
             cursor = readableDB?.query(
-                    WORD_LIST_TABLE,
+                    WordListContract.WordList.WORD_LIST_TABLE,
                     columns,
                     where,
                     whereArgs,
@@ -126,9 +128,16 @@ class WordListOpenHelper(context: Context)
         return cursor
     }
 
-    fun count(): Long {
-        readableDB = readableDB ?: readableDatabase
-        return DatabaseUtils.queryNumEntries(readableDB, WORD_LIST_TABLE)
+    fun count(): Cursor? {
+        val cursor = MatrixCursor(arrayOf(WordListContract.CONTENT_PATH))
+        try {
+            readableDB = readableDB ?: readableDatabase
+            val count = DatabaseUtils.queryNumEntries(readableDB, WORD_LIST_TABLE)
+            cursor.addRow(arrayOf(count))
+        } catch (e: Exception) {
+            Log.d(TAG, "EXCEPTION $e")
+        }
+        return cursor
     }
 
     private fun seedData(db: SQLiteDatabase?) {
@@ -160,13 +169,7 @@ class WordListOpenHelper(context: Context)
     companion object {
 
         private val TAG = WordListOpenHelper::class.java.name
-
-        private const val DATABASE_NAME = "com.chalat.wordlist.database"
-        private const val WORD_LIST_TABLE = "word_entries"
         private const val DATABASE_VERSION = 1
-
-        const val KEY_ID = "_id"
-        const val KEY_WORD = "word"
 
         private val COLUMNS = arrayOf(KEY_ID, KEY_WORD)
 

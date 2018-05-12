@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.example.wordlistsql
+package com.android.example.wordlistsqlwithcontentprovider.edit
 
 import android.app.Activity
 import android.content.Intent
@@ -22,6 +22,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.EditText
+import com.android.example.wordlistsqlwithcontentprovider.R
+import com.android.example.wordlistsqlwithcontentprovider.main.MainActivity
+import com.android.example.wordlistsqlwithcontentprovider.main.WordListAdapter
 
 
 /**

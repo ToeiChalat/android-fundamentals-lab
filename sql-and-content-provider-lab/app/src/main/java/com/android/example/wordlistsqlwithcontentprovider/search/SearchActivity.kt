@@ -1,9 +1,11 @@
-package com.android.example.wordlistsql
+package com.android.example.wordlistsqlwithcontentprovider.search
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.android.example.wordlistsql.db.WordListOpenHelper
+import com.android.example.wordlistsqlwithcontentprovider.R
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListContract
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListOpenHelper
 import kotlinx.android.synthetic.main.activity_search.*
 
 class SearchActivity : AppCompatActivity() {
@@ -25,7 +27,7 @@ class SearchActivity : AppCompatActivity() {
             var index: Int
             var result: String
             do {
-                index = cursor.getColumnIndex(WordListOpenHelper.KEY_WORD)
+                index = cursor.getColumnIndex(WordListContract.WordList.KEY_WORD)
                 result = cursor.getString(index)
                 searchResult.append("$result\n")
             } while (cursor.moveToNext())

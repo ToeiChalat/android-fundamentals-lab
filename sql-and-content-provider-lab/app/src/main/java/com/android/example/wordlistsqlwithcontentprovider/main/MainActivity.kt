@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.android.example.wordlistsql
+package com.android.example.wordlistsqlwithcontentprovider.main
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -27,8 +28,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.android.example.wordlistsqlwithcontentprovider.edit.EditWordActivity
+import com.android.example.wordlistsqlwithcontentprovider.R
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListContract
+import com.android.example.wordlistsqlwithcontentprovider.search.SearchActivity
 
-import com.android.example.wordlistsql.db.WordListOpenHelper
+import com.android.example.wordlistsqlwithcontentprovider.data.WordListOpenHelper
 
 /**
  * Implements a RecyclerView that displays a list of words from a SQL database.
@@ -41,19 +46,14 @@ class MainActivity : AppCompatActivity() {
     private var recyclerView: RecyclerView? = null
     private var adapter: WordListAdapter? = null
 
-    private var mDB: WordListOpenHelper? = null
-
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        mDB = WordListOpenHelper(this)
-
         // Create recycler view.
         recyclerView = findViewById<View>(R.id.recyclerview) as RecyclerView
         // Create an adapter and supply the data to be displayed.
-        adapter = WordListAdapter(this, mDB)
+        adapter = WordListAdapter(this)
         // Connect the adapter with the recycler view.
         recyclerView?.adapter = adapter
         // Give the recycler view a default layout manager.
@@ -90,11 +90,18 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 val word = data.getStringExtra(EditWordActivity.EXTRA_REPLY)
                 if (!word.isEmpty()) {
+                    val values = ContentValues()
+                    values.put(WordListContract.WordList.KEY_WORD, word)
                     val id = data.getIntExtra(WordListAdapter.EXTRA_ID, -99)
                     if (id == WORD_ADD) {
-                        mDB?.insert(word)
+                        contentResolver.insert(WordListContract.CONTENT_URI, values)
                     } else if (id >= 0) {
-                        mDB?.update(id, word)
+                        contentResolver.update(
+                                WordListContract.CONTENT_URI,
+                                values,
+                                WordListContract.WordList.KEY_ID,
+                                arrayOf(id.toString())
+                        )
                     }
 
                     adapter?.notifyDataSetChanged()

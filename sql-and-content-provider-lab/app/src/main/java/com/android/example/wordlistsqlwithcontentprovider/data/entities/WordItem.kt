@@ -1,4 +1,4 @@
-package com.android.example.wordlistsql.db
+package com.android.example.wordlistsqlwithcontentprovider.data.entities
 
 /**
  *

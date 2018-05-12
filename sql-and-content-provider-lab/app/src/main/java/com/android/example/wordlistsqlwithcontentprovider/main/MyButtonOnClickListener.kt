@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.example.wordlistsql
+package com.android.example.wordlistsqlwithcontentprovider.main
 
 import android.view.View
 
