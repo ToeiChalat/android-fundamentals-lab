@@ -16,6 +16,7 @@ class WordListContentProvider : ContentProvider() {
     private var db: WordListOpenHelper? = null
 
     override fun delete(uri: Uri, selection: String, selectionArgs: Array<String>): Int {
+        context.contentResolver.notifyChange(WordListContract.CONTENT_URI, null)
         return db?.delete(selectionArgs[0].toInt()) ?: -1
     }
 
@@ -29,6 +30,7 @@ class WordListContentProvider : ContentProvider() {
 
     override fun insert(uri: Uri, values: ContentValues): Uri? {
         val id = db?.insert(values)
+        context.contentResolver.notifyChange(WordListContract.CONTENT_URI, null)
         return Uri.parse("${WordListContract.CONTENT_PATH}/$id")
     }
 
@@ -53,6 +55,7 @@ class WordListContentProvider : ContentProvider() {
                 // You should do some error handling here.
                 Log.d(TAG, "INVALID URI - URI NOT RECOGNIZED: $uri")
         }
+        cursor?.setNotificationUri(context.contentResolver, uri)
         return cursor
     }
 
@@ -60,6 +63,7 @@ class WordListContentProvider : ContentProvider() {
                         values: ContentValues,
                         selection: String,
                         selectionArgs: Array<String>): Int {
+        context.contentResolver.notifyChange(WordListContract.CONTENT_URI, null)
         return db?.update(
                 selectionArgs[0].toInt(),
                 values.getAsString(WordListContract.WordList.KEY_WORD)
